@@ -157,54 +157,7 @@ def create_part_masks(pose, joint_order):
 # TRANSFORM
 #
 def estimate_transform_params(poses, joint_order):
-    if params['2d_3d_warp']:
-        return affine_transforms(poses[0], poses[1], joint_order)
-    else:
-        return helmert_transforms_3d(poses[0], poses[1], joint_order)
-
-
-# 2D
-def affine_transforms(array1, array2, joint_order):
-    array1 = array1.copy()[:2]
-    array2 = array2.copy()[:2]
-    kp1 = give_name_to_keypoints(array1, joint_order)
-    kp2 = give_name_to_keypoints(array2, joint_order)
-
-    st1 = compute_st_distance(kp1)
-    st2 = compute_st_distance(kp2)
-
-    transforms = []
-
-    body_poly_1 = get_array_of_points(kp1, ['rhip', 'lhip', 'lsho', 'rsho'])
-    body_poly_2 = get_array_of_points(kp2, ['rhip', 'lhip', 'lsho', 'rsho'])
-    tr = estimate_transform('affine', src=body_poly_2, dst=body_poly_1)
-
-    transforms.append(tr.params)
-
-    head_kp_names = ['neck', 'leye', 'reye', 'nose', 'lear', 'rear', 'lsho', 'rsho']
-    head_poly_1 = get_array_of_points(kp1, list(head_kp_names))
-    head_poly_2 = get_array_of_points(kp2, list(head_kp_names))
-    tr = estimate_transform('affine', src=head_poly_2, dst=head_poly_1)
-    transforms.append(tr.params)
-
-    def estimate_join(fr, to, inc_to):
-        poly_2 = estimate_polygon(kp2[fr], kp2[to], st2, inc_to, 0.1, 0.2, 0.2)
-        poly_1 = estimate_polygon(kp1[fr], kp1[to], st1, inc_to, 0.1, 0.2, 0.2)
-        return estimate_transform('affine', src=poly_2, dst=poly_1).params
-
-    transforms.append(estimate_join('lsho', 'lelb', 0.1))
-    transforms.append(estimate_join('lelb', 'lwri', 0.3))
-
-    transforms.append(estimate_join('rsho', 'relb', 0.1))
-    transforms.append(estimate_join('relb', 'rwri', 0.3))
-
-    transforms.append(estimate_join('lhip', 'lkne', 0.1))
-    transforms.append(estimate_join('lkne', 'lank', 0.3))
-
-    transforms.append(estimate_join('rhip', 'rkne', 0.1))
-    transforms.append(estimate_join('rkne', 'rank', 0.3))
-
-    return np.array(transforms).reshape((-1, 9))[..., :-1].astype(np.float32)
+    return helmert_transforms_3d(poses[0], poses[1], joint_order)
 
 
 # 3D
