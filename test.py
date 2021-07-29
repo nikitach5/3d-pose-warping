@@ -1,6 +1,6 @@
 from dataset_definitions import get_dataset
 from model import generator, discriminator
-from parallel_map import parallel_map_as_tf_dataset
+from parallel_threading import parallel_map_as_tf_dataset
 from losses import init_perception_model, get_pose_loss, init_pose_model
 import tensorflow as tf
 from utils import initialize_uninitialized, make_pretrained_weight_loader, ssim
@@ -25,15 +25,14 @@ if __name__ == '__main__':
     backend.set_session(sess)
     init_perception_model()
 
-    # VALIDATION GRAPH
-    print('build validation graph')
+    # TESTING GRAPH
+    print('build testing graph')
 
-    # the validation dataset consists of the same samples every time, so results are comparable
     valid_count = params['valid_count']
 
     valid_dataset = get_dataset(params['dataset'], deterministic=True, with_to_masks=True)
     valid_data = []
-    if params['with_valid']:  # if we train with valid, we use the test set instead of the valid set for validation
+    if params['with_valid']:  
         for valid_sample in valid_dataset.next_test_sample():
             valid_data.append(valid_sample)
             if len(valid_data) == valid_count:
@@ -68,10 +67,7 @@ if __name__ == '__main__':
         )
 
         # 2D mask for target pose to compute foreground SSIM
-    if params['2d_3d_warp']:
-        valid_fg_mask = valid_mask_to
-    else:
-        valid_fg_mask = tf.reduce_max(valid_mask_to, axis=3)
+    valid_fg_mask = tf.reduce_max(valid_mask_to, axis=3)
     valid_fg_mask = valid_fg_mask[:, :-1, :-1]
     valid_fg_mask = tf.image.resize_images(valid_fg_mask, (params['image_size'], params['image_size']),
                                            method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
@@ -136,12 +132,12 @@ if __name__ == '__main__':
         summary_writer.add_summary(summary, 0)
 
         print('- creating images for tensorboard')
-        v_inp = np.concatenate(v_inp[:16], axis=0)
-        v_tar = np.concatenate(v_tar[:16], axis=0)
-        v_gen = np.concatenate(v_gen[:16], axis=0)
-        v_bg = np.concatenate(v_bg[:16], axis=0)
-        v_bg_mask = np.concatenate(v_bg_mask[:16], axis=0)
-        v_fg = np.concatenate(v_fg[:16], axis=0)
+        v_inp = np.concatenate(v_inp[:valid_count], axis=0)
+        v_tar = np.concatenate(v_tar[:valid_count], axis=0)
+        v_gen = np.concatenate(v_gen[:valid_count], axis=0)
+        v_bg = np.concatenate(v_bg[:valid_count], axis=0)
+        v_bg_mask = np.concatenate(v_bg_mask[:valid_count], axis=0)
+        v_fg = np.concatenate(v_fg[:valid_count], axis=0)
         res = np.concatenate([v_inp, v_tar, v_gen, v_bg, v_bg_mask, v_fg], axis=1)
         plt.imsave('output/res_with_mask.png', res, format='png')
         s = BytesIO()
@@ -153,7 +149,7 @@ if __name__ == '__main__':
         print('Performed validation:', time.time() - val_start)
 
         res2 = np.concatenate([v_inp, v_tar, v_gen], axis=1)
-        plt.imsave('output/res1.png', res2, format='png')
+        plt.imsave('output/res.png', res2, format='png')
 
     else:
         print("No Model Found!!")
