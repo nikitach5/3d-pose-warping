@@ -82,15 +82,15 @@ def warpingModule(mask,transform,joint):
 
 
 #Testing:
-dt = time.time()
+#dt = time.time()
 
-ji=np.array([3,-4,3])
-jf=np.array([4.99,6.26,11.9])
-j2i=np.array([-5,-7,-4])
-j2f=np.array([3,-2,-6])
-mask=np.array([[2.29,5.38,3.11,3],[0.07,2.43,3.92,2.5],[6.79,8.66,10,7.5]])
-c=rotation_estimation(ji,jf,j2i,j2f,mask)
-print(c)
-df = time.time()
+#ji=np.array([3,-4,3])
+#jf=np.array([4.99,6.26,11.9])
+#j2i=np.array([-5,-7,-4])
+#j2f=np.array([3,-2,-6])
+#mask=np.array([[2.29,5.38,3.11,3],[0.07,2.43,3.92,2.5],[6.79,8.66,10,7.5]])
+#c=rotation_estimation(ji,jf,j2i,j2f,mask)
+#print(c)
+#df = time.time()
 
-print('1 mask coordinate is generated in:',(df-dt)/4,'ms')
+#print('1 mask coordinate is generated in:',(df-dt)/4,'ms')
