@@ -27,7 +27,7 @@ def rotation_estimation_3joint(joint1i,joint2i,joint3i,joint1f,joint2f,joint3f,m
   Mi=np.column_stack((ai*scle,bi*scle,ci*scle))
   Mf=np.column_stack((af,bf,cf))
 
-  rotation_mat=tf.linalg.matmul((Mf),tf.linalg.inv(Mi)) #s*R(ji-mi)=jf-mf
+  rotation_mat=tf.linalg.matmul((Mf),tf.linalg.pinv(Mi)) #s*R(ji-mi)=jf-mf
   midi=np.reshape(midi,(3,-1))
 
   mask=np.reshape(mask,(3,-1))
