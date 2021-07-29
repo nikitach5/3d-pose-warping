@@ -14,7 +14,7 @@ def init():
     params['batches'] = 150000
 
     # datset information
-    params['dataset'] = 'iPER'
+    params['dataset'] = 'fashion3d'
     params['image_size'] = 256
     params['volume_size'] = 64  # height/width of volume, used by dataset to generate masks, must be 64 for our model
     params['data_workers'] = 7  # parallel workers for bodypart-mask generation and transformation estimation
