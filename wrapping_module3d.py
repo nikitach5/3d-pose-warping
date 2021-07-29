@@ -1,9 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import time
-import tensorflow as tf
-from parameters import params
-import numpy as np
+
 
 
 
